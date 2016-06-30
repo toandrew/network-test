@@ -17,7 +17,7 @@ import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
 
-    private Spinner mDataTypeSpinner;
+    private SendManager mSendManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,6 +52,9 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
+
+        mSendManager = new SendManager();
+        mSendManager.start();
     }
 
     @Override
@@ -76,6 +79,13 @@ public class MainActivity extends AppCompatActivity {
 
         // Commit the edits!
         editor.commit();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+
+        mSendManager.close();
     }
 
     public void sendData(View view) {
