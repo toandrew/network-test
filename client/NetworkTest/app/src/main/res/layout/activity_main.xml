@@ -88,8 +88,7 @@
             android:layout_below="@id/editTextData"
             android:layout_alignParentBottom="true"
             android:layout_centerHorizontal="true"
-            android:onClick="sendData"
-            android:text="@string/button_send"
+            android:text="@string/button_start"
             android:textSize="30sp" />
     </RelativeLayout>
 </ScrollView>

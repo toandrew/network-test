@@ -1,23 +1,30 @@
 package com.xiaoyezi.tools.networktest;
 
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
-import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.InputType;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.xiaoyezi.tools.networktest.controllers.NetManager;
+import com.xiaoyezi.tools.networktest.utils.Constants;
+
 public class MainActivity extends AppCompatActivity {
 
-    private SendManager mSendManager;
+    private NetManager mNetManager;
+
+    private Button mSendButton;
+    private Spinner mSpinner;
+
+    private Constants.TRANSPORT_TYPE mPreferredTransportMode = Constants.TRANSPORT_TYPE.TYPE_TCP;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,22 +46,51 @@ public class MainActivity extends AppCompatActivity {
         ArrayAdapter dataTypeArrayAdapter = ArrayAdapter.createFromResource(this, R.array.plants, android.R.layout.simple_spinner_item);
         dataTypeArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
-        Spinner dataTypeSpinner = (Spinner) findViewById(R.id.dataType);
-        dataTypeSpinner.setAdapter(dataTypeArrayAdapter);
-        dataTypeSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener(){
+        mSpinner = (Spinner) findViewById(R.id.dataType);
+        mSpinner.setAdapter(dataTypeArrayAdapter);
+        mSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> arg0, View arg1, int arg2,
                                        long arg3) {
+                Constants.TRANSPORT_TYPE type = Constants.TRANSPORT_TYPE.TYPE_NONE;
+
+                switch (arg2) {
+                    case 0:
+                        type = Constants.TRANSPORT_TYPE.TYPE_TCP;
+                        break;
+                    case 1:
+                        type = Constants.TRANSPORT_TYPE.TYPE_UDP;
+                        break;
+                    case 2:
+                        type = Constants.TRANSPORT_TYPE.TYPE_RUDP;
+                        break;
+                }
+
+                setPreferredTransportMode(type);
             }
 
             @Override
             public void onNothingSelected(AdapterView<?> arg0) {
-
+                setPreferredTransportMode(Constants.TRANSPORT_TYPE.TYPE_TCP);
             }
         });
 
-        mSendManager = new SendManager();
-        mSendManager.start();
+        mSendButton = (Button) findViewById(R.id.buttonSend);
+        mSendButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (canStart()) {
+                    startLoop();
+                } else {
+                    stopLoop();
+                }
+
+                updateTransportState();
+            }
+        });
+
+        mNetManager = new NetManager(this);
+        mNetManager.start();
     }
 
     @Override
@@ -85,10 +121,13 @@ public class MainActivity extends AppCompatActivity {
     public void onDestroy() {
         super.onDestroy();
 
-        mSendManager.close();
+        mNetManager.close();
     }
 
-    public void sendData(View view) {
+    /**
+     * Start loop work
+     */
+    private void startLoop() {
         Context context = getApplicationContext();
 
         EditText editText = (EditText) findViewById(R.id.editTextIP);
@@ -110,14 +149,65 @@ public class MainActivity extends AppCompatActivity {
         editText = (EditText) findViewById(R.id.editTextData);
         String dataText = editText.getText().toString();
 
-        String uriString = "udp://" + host + ":" + port + "/";
-        uriString += Uri.encode(dataText);
+        // ready to start loop
+        mNetManager.startLoop(getPreferredTransportMode(), host, port, dataText);
+    }
 
-        Uri uri = Uri.parse(uriString);
-        Intent intent = new Intent(Intent.ACTION_SENDTO, uri);
-        intent.addFlags(Intent.FLAG_ACTIVITY_PREVIOUS_IS_TOP);
-        intent.addCategory(Intent.CATEGORY_DEFAULT);
+    /**
+     * Stop loop work
+     */
+    private void stopLoop() {
+        mNetManager.stopLoop();
+    }
 
-        startActivity(intent);
+    /**
+     * Check whether can trigger the loop action.
+     *
+     * @return
+     */
+    private boolean canStart() {
+        Constants.TRANSPORT_TYPE type = mNetManager.getCurrentTransportState();
+        return (type == Constants.TRANSPORT_TYPE.TYPE_NONE);
+    }
+
+    /**
+     * Check whether we can trigger the stop loop action.
+     *
+     * @return
+     */
+    private boolean canStop() {
+        Constants.TRANSPORT_TYPE type = mNetManager.getCurrentTransportState();
+        return (type != Constants.TRANSPORT_TYPE.TYPE_NONE);
+    }
+
+    /**
+     * Which mode should be preferred used: tcp, udp or rudp?
+     *
+     * @return
+     */
+    private Constants.TRANSPORT_TYPE getPreferredTransportMode() {
+        return mPreferredTransportMode;
+    }
+
+    /**
+     * Set preferred mode
+     *
+     * @param type
+     */
+    private void setPreferredTransportMode(Constants.TRANSPORT_TYPE type) {
+        mPreferredTransportMode = type;
+    }
+
+    /**
+     * Update ui status.
+     */
+    private void updateTransportState() {
+        if (canStart()) {
+            mSendButton.setText(R.string.button_start);
+        }
+
+        if (canStop()) {
+            mSendButton.setText(R.string.button_stop);
+        }
     }
 }

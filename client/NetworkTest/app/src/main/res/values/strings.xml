@@ -1,7 +1,7 @@
 <resources>
     <string-array name="plants">
-        <item>UDP</item>
         <item>TCP</item>
+        <item>UDP</item>
         <item>RUDP</item>
     </string-array>
 
@@ -14,6 +14,7 @@
     <string name="hint_ip">192.168.1.100</string>
     <string name="hint_text">Text to send</string>
     <string name="hint_port">50000</string>
-    <string name="button_send">Send</string>
+    <string name="button_start">Start!</string>
+    <string name="button_stop">Stop!</string>
     <string name="title_activity_send_to_uri">SendToUri</string>
 </resources>

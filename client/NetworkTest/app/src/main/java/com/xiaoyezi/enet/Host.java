@@ -1,5 +1,7 @@
 package com.xiaoyezi.enet;
 
+import com.xiaoyezi.tools.networktest.utils.Constants;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -12,6 +14,10 @@ import java.nio.ByteOrder;
 import java.util.concurrent.TimeUnit;
 
 public class Host {
+    static {
+        System.loadLibrary(Constants.ENET_LIB_NAME);
+    }
+
     ByteBuffer nativeState;
 
     static int addressToInt(InetAddress address) throws EnetException {
