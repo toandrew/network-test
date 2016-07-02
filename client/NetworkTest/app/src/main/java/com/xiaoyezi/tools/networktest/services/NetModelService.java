@@ -145,6 +145,7 @@ public class NetModelService extends Service implements Runnable {
                     if (mCurrentNetModel != null && !mCurrentNetModel.isConnected()) {
                         mCurrentNetModel.init();
                     }
+
                     Log.d(TAG, "Notify write!!!!");
                     synchronized (mLock) {
                         mLock.notify();

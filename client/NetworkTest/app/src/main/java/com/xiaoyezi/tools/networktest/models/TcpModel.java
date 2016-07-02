@@ -2,6 +2,7 @@ package com.xiaoyezi.tools.networktest.models;
 
 import android.util.Log;
 
+import com.xiaoyezi.tools.networktest.analytics.Analytics;
 import com.xiaoyezi.tools.networktest.utils.Utils;
 
 import org.json.JSONObject;
@@ -10,14 +11,15 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Date;
 
 /**
  * Created by jianmin on 16-7-1.
  */
 public class TcpModel extends NetModel {
     private static final String TAG = "TcpModel";
+
+    private Analytics mAnalytics = Analytics.getInstance();
 
     Socket mSocket = null;
     DataOutputStream mOutputStream = null;
@@ -35,8 +37,11 @@ public class TcpModel extends NetModel {
     @Override
     public int init() throws IOException {
         mSocket = new Socket(getHost(), Integer.parseInt(getPort()));
+        mSocket.setSoTimeout(5000);
+
         mOutputStream = new DataOutputStream(mSocket.getOutputStream());
         mInputStream = new DataInputStream(mSocket.getInputStream());
+
         return 0;
     }
 
@@ -49,6 +54,11 @@ public class TcpModel extends NetModel {
             }
         }
 
+        mReceivedCount = 0;
+        mSentCount = 0;
+
+        mAnalytics.reset();
+
         return 0;
     }
 
@@ -58,15 +68,17 @@ public class TcpModel extends NetModel {
             if (mOutputStream != null) {
                 Log.d(TAG, "sendData:" + mSocket);
 
-                // Send data
-                Map<String, String> map = new HashMap<>();
-                map.put("data", data);
-                map.put("clientSendTime", "haha");
-                JSONObject json = new JSONObject(map);
-                mOutputStream.write(json.toString().getBytes());
-                mSentCount++;
+                // build data
+                Date now = new Date();
+                byte[] buf = Utils.buildsendPacket((new Date()).getTime(), data);
 
-                Log.d(TAG, "send Data:" + json.toString() + "[" + mSentCount + "]");
+                // send it
+                mOutputStream.write(buf);
+
+                // change sent packet count
+                mAnalytics.setSentCount(++mSentCount);
+
+                Log.d(TAG, "send Data:" + buf.toString() + "[" + mSentCount + "]");
             } else {
                 Log.d(TAG, "Send data failed for mOutputStream is null!");
             }
@@ -82,15 +94,20 @@ public class TcpModel extends NetModel {
         try {
             // Receive data
             if (mInputStream != null) {
-                //Log.d(TAG, "BEGIN read  data!!!![ " + mInputStream + "]");
+
                 int len = mInputStream.read(mBuf);
-                mReceivedCount++;
+                if (len > 0) {
+                    mAnalytics.setSentCount(++mReceivedCount);
+
+                    byte[] buf = Utils.buildRecvPacket(mBuf, (new Date()).getTime());
+
+                    // Save it
+                    mAnalytics.saveLog(buf);
+                }
+
                 Log.d(TAG, "received data len: [" + len + "]recvCount[" + mReceivedCount + "]");
 
-                // Save it
-                //saveLog(readData);
-
-                return 0;
+                return len;
             } else {
                 return -1;
             }
