@@ -37,7 +37,7 @@ public abstract class NetModel {
      *
      * @return
      */
-    public int create() throws IOException {
+    public int init() throws IOException {
         return 0;
     }
 
@@ -46,7 +46,7 @@ public abstract class NetModel {
      *
      * @return
      */
-    public int destroy() {
+    public int clean() {
         return 0;
     }
 
@@ -56,7 +56,7 @@ public abstract class NetModel {
      * @param data
      * @return
      */
-    public int startLoop(String data) {
+    public int sendData(String data) {
         return 0;
     }
 
@@ -65,8 +65,12 @@ public abstract class NetModel {
      *
      * @return
      */
-    public int stopLoop() {
+    public int recvData() {
         return 0;
+    }
+
+    public boolean isConnected() {
+        return false;
     }
 
     /**

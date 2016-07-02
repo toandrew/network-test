@@ -2,6 +2,7 @@ package com.xiaoyezi.tools.networktest;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.os.PowerManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.InputType;
@@ -19,6 +20,10 @@ import com.xiaoyezi.tools.networktest.utils.Constants;
 
 public class MainActivity extends AppCompatActivity {
 
+    // Objects for WAKE-LOCK
+    private PowerManager mPwrManager;
+    private PowerManager.WakeLock mWakeLock;
+
     private NetManager mNetManager;
 
     private Button mSendButton;
@@ -31,6 +36,10 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         // Restore preferences
+
+        // WakeLock Initialization
+        mPwrManager = (PowerManager) getSystemService(Context.POWER_SERVICE);
+        mWakeLock = mPwrManager.newWakeLock(PowerManager.FULL_WAKE_LOCK, "NetworkTester");
 
         SharedPreferences settings = getPreferences(0);
 
@@ -94,8 +103,19 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+
+        mWakeLock.acquire();
+    }
+
+    @Override
     public void onPause() {
         super.onPause();
+
+        if (mWakeLock.isHeld()) {
+            mWakeLock.release();
+        }
 
         // Get current values
         EditText editText = (EditText) findViewById(R.id.editTextIP);

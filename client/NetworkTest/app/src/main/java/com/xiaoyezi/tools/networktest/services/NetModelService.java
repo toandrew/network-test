@@ -25,13 +25,16 @@ public class NetModelService extends Service implements Runnable {
 
     public static boolean sIsRunning = false;
 
+    private Thread mSendThread = null;
     private Thread mThread = null;
 
     private Constants.TRANSPORT_TYPE mCurrentTransportType = Constants.TRANSPORT_TYPE.TYPE_NONE;
 
     private NetModel mCurrentNetModel;
 
-    private String mData = "Hello World!!";
+    private String mData = "Hello World!";
+
+    private byte[] mLock = new byte[0];
 
     public class NetBinder extends Binder {
         /**
@@ -43,12 +46,9 @@ public class NetModelService extends Service implements Runnable {
          * @param data
          */
         public void startLoop(Constants.TRANSPORT_TYPE type, String host, String port, String data) {
-            if (mCurrentTransportType != type) {
-                mCurrentTransportType = type;
-                mData = data;
+            Log.d(TAG, "startLoop");
 
-                onTransportTypeChanged(host, port);
-            }
+            startLoopWork(type, host, port, data);
         }
 
         /**
@@ -81,7 +81,29 @@ public class NetModelService extends Service implements Runnable {
 
         sIsRunning = true;
 
-        mThread = new Thread(this, "VpnService");
+        mSendThread = new Thread() {
+            @Override
+            public void run() {
+                try {
+                    while (sIsRunning) {
+                        // wait for signal
+                        Log.d(TAG, "mSendThread:wait!!!!");
+                        synchronized (mLock) {
+                            mLock.wait();
+                        }
+
+                        if (shouldStart()) {
+                            sendData(mData);
+                        }
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        };
+        mSendThread.start();
+
+        mThread = new Thread(this, "RecvService");
         mThread.start();
 
         mBinder = new NetBinder();
@@ -91,6 +113,7 @@ public class NetModelService extends Service implements Runnable {
     public int onStartCommand(Intent intent, int flags, int startId) {
         sIsRunning = true;
 
+        Log.d(TAG, "onStartCommand!");
         return super.onStartCommand(intent, flags, startId);
     }
 
@@ -102,6 +125,10 @@ public class NetModelService extends Service implements Runnable {
     @Override
     public void onDestroy() {
         super.onDestroy();
+        Log.d(TAG, "onDestroy!");
+        synchronized (mLock) {
+            mLock.notifyAll();
+        }
 
         if (mThread != null) {
             mThread.interrupt();
@@ -110,18 +137,27 @@ public class NetModelService extends Service implements Runnable {
 
     @Override
     public void run() {
+        int ret = 0;
+
         try {
             while (sIsRunning) {
-                // sleep to avoid busy looping
+                if (shouldStart()) {
+                    if (mCurrentNetModel != null && !mCurrentNetModel.isConnected()) {
+                        mCurrentNetModel.init();
+                    }
+                    Log.d(TAG, "Notify write!!!!");
+                    synchronized (mLock) {
+                        mLock.notify();
+                    }
 
-                if (shouldStartLoop()) {
-                    startLoop();
+                    ret = recvData();
+                    if (ret < 0) {
+                        Log.d(TAG, "recvData error!!!");
+                    }
                 }
 
                 Thread.sleep(100);
             }
-        } catch (InterruptedException e) {
-            Log.e(TAG, "Exception", e);
         } catch (Exception e) {
             e.printStackTrace();
             Log.e(TAG, "Fatal error", e);
@@ -132,70 +168,88 @@ public class NetModelService extends Service implements Runnable {
     }
 
     /**
-     * Stop service
+     * Start the network model's loop
+     *
+     * @param type
+     * @param host
+     * @param port
+     * @param data
      */
-    private synchronized void stop() {
-        try {
-            Log.d(TAG, "Closing NetModelService service..");
-        } catch (Exception e) {
-        }
-
-        stopLoopWork();
-
-        stopSelf();
-
-        sIsRunning = false;
+    private void startLoopWork(Constants.TRANSPORT_TYPE type, String host, String port, String data) {
+        initNetModel(type, host, port, data);
     }
 
     /**
-     * Trigger some actions when transport type changed.
+     * Let the model to stop loop work
+     */
+    private void stopLoopWork() {
+        if (mCurrentNetModel != null) {
+            mCurrentNetModel.clean();
+            mCurrentNetModel = null;
+        }
+
+        Log.d(TAG, "stopLoopWork!!");
+
+        clearSendState();
+    }
+
+    /**
+     * Stop service
+     */
+    private void stop() {
+        stopLoopWork();
+
+        sIsRunning = false;
+
+        stopSelf();
+    }
+
+    /**
+     * Init net model
      *
      * @param host
      * @param port
      */
-    private void onTransportTypeChanged(String host, String port) {
+    private void initNetModel(Constants.TRANSPORT_TYPE type, String host, String port, String data) {
+        mCurrentTransportType = type;
+        mData = data;
+
         if (mCurrentNetModel != null) {
-            mCurrentNetModel.destroy();
+            mCurrentNetModel.clean();
             mCurrentNetModel = null;
         }
 
         switch (mCurrentTransportType) {
             case TYPE_NONE:
-                Log.d(TAG, "onTransportTypeChanged: TYPE_NONE!");
+                Log.d(TAG, "initNetModel: TYPE_NONE!");
                 break;
 
             case TYPE_UDP:
-                if (mCurrentNetModel == null) {
-                    mCurrentNetModel = new UdpModel(host, port);
-                }
+                mCurrentNetModel = new UdpModel(host, port);
 
-                Log.d(TAG, "onTransportTypeChanged: TYPE_UDP!");
+                Log.d(TAG, "initNetModel: TYPE_UDP!");
                 break;
 
             case TYPE_TCP:
-                if (mCurrentNetModel == null) {
-                    mCurrentNetModel = new TcpModel(host, port);
-                }
+                mCurrentNetModel = new TcpModel(host, port);
 
-                Log.d(TAG, "onTransportTypeChanged: TYPE_TCP!");
+                Log.d(TAG, "initNetModel: TYPE_TCP!");
                 break;
 
             case TYPE_RUDP:
-                if (mCurrentNetModel == null) {
-                    mCurrentNetModel = new RudpModel(host, port);
-                }
+                mCurrentNetModel = new RudpModel(host, port);
 
-                Log.d(TAG, "onTransportTypeChanged: TYPE_RUDP!");
+                Log.d(TAG, "initNetModel: TYPE_RUDP!");
                 break;
         }
     }
 
     /**
-     * Whether we should begin send data
+     * Whether we should begin send/recv data
      *
      * @return
      */
-    private boolean shouldStartLoop() {
+    private boolean shouldStart() {
         return mCurrentTransportType != Constants.TRANSPORT_TYPE.TYPE_NONE;
     }
 
@@ -209,23 +263,19 @@ public class NetModelService extends Service implements Runnable {
     /**
      * Let the model to send data
      */
-    private void startLoop() throws IOException {
+    private int recvData() throws IOException {
+        int ret = 0;
+
         if (mCurrentNetModel != null) {
-            mCurrentNetModel.startLoop(mData);
+            ret = mCurrentNetModel.recvData();
         }
+
+        return ret;
     }
 
-    /**
-     * Let the model to stop loop work
-     */
-    private void stopLoopWork() {
+    private void sendData(String data) {
         if (mCurrentNetModel != null) {
-            mCurrentNetModel.stopLoop();
-            mCurrentNetModel = null;
+            mCurrentNetModel.sendData(data);
         }
-
-        Log.d(TAG, "stopLoopWork!!");
-
-        clearSendState();
     }
 }

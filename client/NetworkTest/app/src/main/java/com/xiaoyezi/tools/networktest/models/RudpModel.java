@@ -11,22 +11,22 @@ public class RudpModel extends NetModel {
     }
 
     @Override
-    public int create() {
+    public int init() {
         return 0;
     }
 
     @Override
-    public int destroy() {
+    public int clean() {
         return 0;
     }
 
     @Override
-    public int startLoop(String data) {
+    public int sendData(String data) {
         return 0;
     }
 
     @Override
-    public int stopLoop() {
+    public int recvData() {
         return 0;
     }
 
