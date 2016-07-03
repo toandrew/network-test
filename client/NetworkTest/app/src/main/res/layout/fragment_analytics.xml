@@ -1,24 +1,130 @@
-<LinearLayout
-  xmlns:android="http://schemas.android.com/apk/res/android"
-  android:orientation="vertical"
-  android:layout_width="match_parent"
-  android:layout_height="match_parent"
-  android:gravity="center"
-  >
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent">
 
   <TextView
-    android:id="@+id/item_subtitle"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:text="Page:"
-    android:textAppearance="?android:attr/textAppearanceLarge"
-    />
+      android:text="Network Status Information"
+      android:id="@+id/textView5"
+      android:layout_width="fill_parent"
+      android:layout_height="wrap_content" android:gravity="center"
+      android:paddingBottom="5px" android:paddingTop="5px" android:textSize="20sp"/>
+
+  <LinearLayout
+      android:layout_width="fill_parent"
+      android:layout_height="wrap_content">
+    <TextView
+        android:text="[WiFi/3G] : "
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+    <TextView
+        android:text="3G"
+        android:id="@+id/wifi3g"
+        android:layout_height="wrap_content" android:layout_width="fill_parent"/>
+  </LinearLayout>
+
+  <LinearLayout
+      android:layout_width="fill_parent"
+      android:layout_height="wrap_content">
+    <TextView
+        android:text="[Availability] : "
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+    <TextView
+        android:text="Unavailable"
+        android:id="@+id/isAvailable"
+        android:layout_height="wrap_content" android:layout_width="fill_parent"/>
+  </LinearLayout>
+  <LinearLayout
+      android:layout_width="fill_parent"
+      android:layout_height="wrap_content">
+    <TextView
+        android:text="[TCP Connection] : "
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+    <TextView
+        android:text="DISCONNECTED"
+        android:id="@+id/isConnected"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"/>
+  </LinearLayout>
+
+  <LinearLayout
+      android:layout_width="fill_parent"
+      android:layout_height="wrap_content">
+
+    <TextView
+        android:text="[Device IP Address] : "
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+    <TextView
+        android:id="@+id/ipAddr"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="0.0.0.0"/>
+  </LinearLayout>
+
+  <LinearLayout
+      android:layout_width="fill_parent"
+      android:layout_height="wrap_content">
+    <TextView
+        android:text="[Socket IP Address] : "
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+    <TextView
+        android:id="@+id/socketIpAddr"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="0.0.0.0"/>
+  </LinearLayout>
 
   <TextView
-    android:id="@+id/item_title"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:textSize="80sp"
-    />
+      android:text="-----------------------------------"
+      android:gravity="center"
+      android:layout_height="wrap_content"
+      android:layout_width="fill_parent"
+      android:paddingBottom="5px" android:paddingTop="5px" />
 
+  <TextView
+      android:text="Tx/Rx Statistics"
+      android:id="@+id/textView4"
+      android:layout_width="fill_parent"
+      android:layout_height="wrap_content" android:gravity="center"
+      android:paddingBottom="10px" android:paddingTop="10px" android:textSize="20sp"/>
+  <LinearLayout
+      android:layout_width="fill_parent"
+      android:layout_height="wrap_content">
+    <TextView
+        android:text="[TX] : "
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+    <TextView
+        android:text="0"
+        android:id="@+id/txStat"
+        android:layout_height="wrap_content" android:layout_width="fill_parent"/>
+  </LinearLayout>
+
+  <LinearLayout
+      android:layout_width="fill_parent"
+      android:layout_height="wrap_content">
+    <TextView
+        android:text="[RX] : "
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+    <TextView
+        android:text="0"
+        android:id="@+id/rxStat"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"/>
+  </LinearLayout>
+
+  <LinearLayout
+      android:layout_width="fill_parent"
+      android:layout_height="wrap_content">
+    <TextView
+        android:id="@+id/minMaxAvg"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+  </LinearLayout>
 </LinearLayout>

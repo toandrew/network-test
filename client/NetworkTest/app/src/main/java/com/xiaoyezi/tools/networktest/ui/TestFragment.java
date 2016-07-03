@@ -35,6 +35,14 @@ public class TestFragment extends Fragment {
     private Constants.TRANSPORT_TYPE mPreferredTransportMode = Constants.TRANSPORT_TYPE.TYPE_TCP;
 
     @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        mNetManager = new NetManager(getActivity());
+        mNetManager.start();
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_test, container, false);
@@ -103,9 +111,6 @@ public class TestFragment extends Fragment {
                 updateTransportState();
             }
         });
-
-        mNetManager = new NetManager(getActivity());
-        mNetManager.start();
     }
 
     @Override
