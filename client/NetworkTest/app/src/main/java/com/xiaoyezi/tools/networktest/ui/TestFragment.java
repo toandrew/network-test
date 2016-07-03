@@ -169,6 +169,9 @@ public class TestFragment extends Fragment {
         }
         editText = (EditText) mView.findViewById(R.id.editTextData);
         String dataText = editText.getText().toString();
+        if (dataText.isEmpty()) {
+            dataText = getResources().getString(R.string.hint_text);
+        }
 
         // ready to start loop
         mNetManager.startLoop(getPreferredTransportMode(), host, port, dataText);
