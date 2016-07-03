@@ -69,7 +69,6 @@ public class TcpModel extends NetModel {
                 Log.d(TAG, "sendData:" + mSocket);
 
                 // build data
-                Date now = new Date();
                 byte[] buf = Utils.buildsendPacket((new Date()).getTime(), data);
 
                 // send it
@@ -97,7 +96,7 @@ public class TcpModel extends NetModel {
 
                 int len = mInputStream.read(mBuf);
                 if (len > 0) {
-                    mAnalytics.setSentCount(++mReceivedCount);
+                    mAnalytics.setRecvCount(++mReceivedCount);
 
                     byte[] buf = Utils.buildRecvPacket(mBuf, (new Date()).getTime());
 
