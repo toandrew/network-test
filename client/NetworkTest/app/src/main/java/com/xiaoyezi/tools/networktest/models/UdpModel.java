@@ -92,7 +92,7 @@ public class UdpModel extends NetModel {
             if (dp.getLength() > 0) {
                 mAnalytics.setRecvCount(++mReceivedCount);
 
-                byte[] buf = Utils.buildRecvPacket(mBuf, (new Date()).getTime());
+                byte[] buf = Utils.buildRecvPacket(dp.getData(), (new Date()).getTime());
 
                 // Save it
                 mAnalytics.saveLog(buf);
