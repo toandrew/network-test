@@ -41,28 +41,12 @@ public class TestFragment extends Fragment {
 
     private Timer mTimer;
 
-    private TimerTask mTimerTask;
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         mNetManager = new NetManager(getActivity());
         mNetManager.start();
-
-        mTimer = new Timer();
-
-        mTimerTask = new TimerTask() {
-            @Override
-            public void run() {
-                getActivity().runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        updateTransportState();
-                    }
-                });
-            }
-        };
     }
 
     @Override
@@ -137,7 +121,20 @@ public class TestFragment extends Fragment {
 
         setPreferredTransportMode(mNetManager.getCurrentTransportState());
 
-        mTimer.schedule(mTimerTask, 1000, 3000);
+        mTimer = new Timer();
+
+        mTimer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Log.d(TAG, "xxxx!!!");
+                        updateTransportState();
+                    }
+                });
+            }
+        }, 1000, 3000);
     }
 
     @Override
@@ -165,13 +162,21 @@ public class TestFragment extends Fragment {
     }
 
     @Override
-    public void onDestroy() {
-        super.onDestroy();
-        Log.d(TAG, "onDestroy!!!!");
+    public void onDestroyView() {
+        super.onDestroyView();
+
+        Log.e(TAG, "onDestroyView!!!!");
 
         if (mTimer != null) {
             mTimer.cancel();
+            mTimer = null;
         }
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        Log.d(TAG, "onDestroy!!!!");
 
         mNetManager.close();
     }

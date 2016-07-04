@@ -6,6 +6,7 @@ import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,6 +27,8 @@ import java.util.TimerTask;
  * Created by jianmin on 16-7-3.
  */
 public class AnalyticsFragment extends Fragment {
+    private static final String TAG = "AnalyticsFragment";
+
     private TextView mIsAvailable;
     private TextView mWifi3g;
     private TextView mIsConnected;
@@ -40,25 +43,9 @@ public class AnalyticsFragment extends Fragment {
 
     private Timer mTimer;
 
-    private TimerTask mTimerTask;
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        mTimer = new Timer();
-
-        mTimerTask = new TimerTask() {
-            @Override
-            public void run() {
-                getActivity().runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        refresh();
-                    }
-                });
-            }
-        };
     }
 
     @Override
@@ -81,7 +68,18 @@ public class AnalyticsFragment extends Fragment {
         mMinMaxAvg = (TextView) view.findViewById(R.id.minMaxAvg);
         mLoss = (TextView) view.findViewById(R.id.loss);
 
-        mTimer.schedule(mTimerTask, 1000, 5000);
+        mTimer = new Timer();
+        mTimer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        refresh();
+                    }
+                });
+            }
+        }, 1000, 5000);
     }
 
     @Override
@@ -95,11 +93,19 @@ public class AnalyticsFragment extends Fragment {
     }
 
     @Override
-    public void onDestroy() {
+    public void onDestroyView() {
+        super.onDestroyView();
+
+        Log.e(TAG, "onDestroyView!!!!");
+
         if (mTimer != null) {
             mTimer.cancel();
+            mTimer = null;
         }
+    }
 
+    @Override
+    public void onDestroy() {
         super.onDestroy();
     }
 
