@@ -19,6 +19,7 @@ import com.xiaoyezi.tools.networktest.analytics.Analytics;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.nio.channels.SocketChannel;
+import java.text.NumberFormat;
 import java.util.Enumeration;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -43,9 +44,14 @@ public class AnalyticsFragment extends Fragment {
 
     private Timer mTimer;
 
+    NumberFormat mNumberFormat;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        mNumberFormat = NumberFormat.getNumberInstance();
+        mNumberFormat.setMaximumFractionDigits(2);
     }
 
     @Override
@@ -167,9 +173,10 @@ public class AnalyticsFragment extends Fragment {
 
         float loss = 0;
         loss = Analytics.getInstance().getLoss();
-        mLoss.setText(loss*100 + "%");
+        mLoss.setText(mNumberFormat.format(loss*100) + "%");
 
-        mMinMaxAvg.setText("MIN[" + (Analytics.getInstance().getMinRtt() >= Long.MAX_VALUE ? "0" : Analytics.getInstance().getMinRtt())  + "ms]  MAX[" + Analytics.getInstance().getMaxRtt() + "ms]");
+        mMinMaxAvg.setText("MIN[" + (Analytics.getInstance().getMinRtt() >= Long.MAX_VALUE ? "0" : Analytics.getInstance().getMinRtt())
+                + "ms]  MAX[" + Analytics.getInstance().getMaxRtt() + "ms] AVG[" + mNumberFormat.format(Analytics.getInstance().getAvgRtt()) + "ms]");
     }
 
     private String getLocalIpAddress(String netType) {
