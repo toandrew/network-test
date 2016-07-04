@@ -94,6 +94,7 @@ public class TcpModel extends NetModel {
             // Receive data
             if (mInputStream != null) {
 
+                // TODO: NEED CHANGE IT LATER FOR DATA HEADER.
                 int len = mInputStream.read(mBuf);
                 if (len > 0) {
                     mAnalytics.setRecvCount(++mReceivedCount);

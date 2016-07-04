@@ -90,6 +90,7 @@ public class UdpModel extends NetModel {
         DatagramPacket dp = new DatagramPacket(mBuf, mBuf.length);
 
         try {
+            // TODO: NEED CHANGE IT LATER FOR DATA HEADER.
             mSocket.receive(dp);
             if (dp.getLength() > 0) {
                 mAnalytics.setRecvCount(++mReceivedCount);
