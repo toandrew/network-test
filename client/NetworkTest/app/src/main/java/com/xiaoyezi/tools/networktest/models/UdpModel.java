@@ -44,6 +44,8 @@ public class UdpModel extends NetModel {
             mSocket.setSoTimeout(5000); // recv timeout!
         } catch (Exception e) {
             e.printStackTrace();
+
+            return -1;
         }
 
         return 0;
@@ -109,6 +111,11 @@ public class UdpModel extends NetModel {
             e.printStackTrace();
         }
         return 0;
+    }
+
+    @Override
+    public boolean isConnected() {
+        return mSocket != null;
     }
 
     @Override

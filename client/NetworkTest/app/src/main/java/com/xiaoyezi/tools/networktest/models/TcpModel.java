@@ -35,12 +35,18 @@ public class TcpModel extends NetModel {
     }
 
     @Override
-    public int init() throws IOException {
-        mSocket = new Socket(getHost(), Integer.parseInt(getPort()));
-        mSocket.setSoTimeout(5000);
+    public int init() {
+        try {
+            mSocket = new Socket(getHost(), Integer.parseInt(getPort()));
+            mSocket.setSoTimeout(5000);
 
-        mOutputStream = new DataOutputStream(mSocket.getOutputStream());
-        mInputStream = new DataInputStream(mSocket.getInputStream());
+            mOutputStream = new DataOutputStream(mSocket.getOutputStream());
+            mInputStream = new DataInputStream(mSocket.getInputStream());
+        }catch(Exception e) {
+            e.printStackTrace();
+
+            return -1;
+        }
 
         return 0;
     }
@@ -125,7 +131,7 @@ public class TcpModel extends NetModel {
 
     @Override
     public boolean isConnected() {
-        return mSocket != null;
+        return mSocket != null && mOutputStream != null && mInputStream != null;
     }
 
     @Override

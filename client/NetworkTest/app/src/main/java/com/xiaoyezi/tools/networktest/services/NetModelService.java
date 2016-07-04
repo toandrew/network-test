@@ -143,7 +143,13 @@ public class NetModelService extends Service implements Runnable {
             while (sIsRunning) {
                 if (shouldStart()) {
                     if (mCurrentNetModel != null && !mCurrentNetModel.isConnected()) {
-                        mCurrentNetModel.init();
+                        ret = mCurrentNetModel.init();
+                        if (ret < 0) {
+                            Log.e(TAG, "Failed to init net model. wait for next around!");
+                            Thread.sleep(3000);
+                            continue;
+
+                        }
                     }
 
                     Log.d(TAG, "Notify write!!!!");
