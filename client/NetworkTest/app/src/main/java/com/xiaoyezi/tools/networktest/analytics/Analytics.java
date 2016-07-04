@@ -21,6 +21,8 @@ public class Analytics {
     private double mAvgRtt = 0;
     private double mTotalRtt = 0;
 
+    private double mCurrentRtt = 0;
+
     private Analytics() {
     }
 
@@ -43,6 +45,7 @@ public class Analytics {
         mMaxRtt = 0;
         mAvgRtt = 0;
         mTotalRtt = 0;
+        mCurrentRtt = 0;
     }
 
     public void setSentCount(int count) {
@@ -75,6 +78,8 @@ public class Analytics {
 
         mTotalRtt += rtt;
         mAvgRtt = Math.max(0, mTotalRtt/getRecvCount());
+
+        mCurrentRtt = rtt;
     }
     public double getMinRtt() {
         return mMinRtt;
@@ -86,6 +91,10 @@ public class Analytics {
 
     public double getAvgRtt() {
         return mAvgRtt;
+    }
+
+    public double getCurrentRtt() {
+        return mCurrentRtt;
     }
 
     private synchronized static void init() {

@@ -176,7 +176,7 @@ public class AnalyticsFragment extends Fragment {
         mLoss.setText(mNumberFormat.format(loss*100) + "%");
 
         mMinMaxAvg.setText("MIN[" + (Analytics.getInstance().getMinRtt() >= Long.MAX_VALUE ? "0" : Analytics.getInstance().getMinRtt())
-                + "ms]  MAX[" + Analytics.getInstance().getMaxRtt() + "ms] AVG[" + mNumberFormat.format(Analytics.getInstance().getAvgRtt()) + "ms]");
+                + "ms]  MAX[" + Analytics.getInstance().getMaxRtt() + "ms] AVG[" + mNumberFormat.format(Analytics.getInstance().getAvgRtt()) + "ms] current[" + Analytics.getInstance().getCurrentRtt() + "ms]");
     }
 
     private String getLocalIpAddress(String netType) {
