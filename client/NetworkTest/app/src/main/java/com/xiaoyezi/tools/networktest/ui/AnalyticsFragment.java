@@ -165,10 +165,8 @@ public class AnalyticsFragment extends Fragment {
         mTxStat.setText(Analytics.getInstance().getSentCount() + "");
         mRxStat.setText(Analytics.getInstance().getRecvCount() + "");
 
-        long loss = 0;
-        if (Analytics.getInstance().getSentCount() > 0) {
-            loss = (Analytics.getInstance().getSentCount() - Analytics.getInstance().getRecvCount()) / Analytics.getInstance().getSentCount();
-        }
+        float loss = 0;
+        loss = Analytics.getInstance().getLoss();
         mLoss.setText(loss*100 + "%");
 
         mMinMaxAvg.setText("MIN[" + (Analytics.getInstance().getMinRtt() >= Long.MAX_VALUE ? "0" : Analytics.getInstance().getMinRtt())  + "ms]  MAX[" + Analytics.getInstance().getMaxRtt() + "ms]");

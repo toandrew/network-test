@@ -146,9 +146,12 @@ public class NetModelService extends Service implements Runnable {
                         ret = mCurrentNetModel.init();
                         if (ret < 0) {
                             Log.e(TAG, "Failed to init net model. wait for next around!");
-                            Thread.sleep(3000);
+                            try {
+                                Thread.sleep(3000);
+                            }catch(Exception e) {
+                                e.printStackTrace();
+                            }
                             continue;
-
                         }
                     }
 

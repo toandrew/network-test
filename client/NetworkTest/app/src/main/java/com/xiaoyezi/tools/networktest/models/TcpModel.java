@@ -76,14 +76,16 @@ public class TcpModel extends NetModel {
 
                 // build data
                 JSONObject sendData = Utils.buildsendPacket((new Date()).getTime(), data);
+                int len = sendData.toString().getBytes().length;
 
                 // send it
-                mOutputStream.write(sendData.toString().getBytes());
+                mOutputStream.writeInt(len);
+                mOutputStream.write(sendData.toString().getBytes()); // package
 
                 // change sent packet count
                 mAnalytics.setSentCount(++mSentCount);
 
-                Log.d(TAG, "send Data:" + sendData.toString() + "[" + mSentCount + "]");
+                Log.d(TAG, "send Data:len[" + len + "][" + sendData.toString() + "[" + mSentCount + "]");
             } else {
                 Log.d(TAG, "Send data failed for mOutputStream is null!");
             }
@@ -101,8 +103,12 @@ public class TcpModel extends NetModel {
             if (mInputStream != null) {
 
                 // TODO: NEED CHANGE IT LATER FOR DATA HEADER.
-                int len = mInputStream.read(mBuf);
+                //int len = mInputStream.read(mBuf);
+                int len = mInputStream.readInt();
+
                 if (len > 0) {
+                    Utils.fullyRead(mInputStream, mBuf, len);
+                    //mInputStream.readFully(mBuf, 0, len);
                     mAnalytics.setRecvCount(++mReceivedCount);
 
                     long t = (new Date()).getTime();
@@ -110,7 +116,7 @@ public class TcpModel extends NetModel {
                     long rtt = t - recvData.getLong("clientSentTime");
                     mAnalytics.updateRtt(rtt);
 
-                    Log.d(TAG, "TCP recvData:[" + recvData.toString() + "]RTT[" + rtt + "]");
+                    Log.d(TAG, "TCP recvData:len[" + len + "][" + recvData.toString() + "]RTT[" + rtt + "]");
 
                     // Save it
                     mAnalytics.saveLog(recvData);
