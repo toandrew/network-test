@@ -66,11 +66,11 @@ public class Analytics {
         mMinRtt = Math.min(mMinRtt, rtt);
         mMaxRtt = Math.max(mMaxRtt, rtt);
     }
-    public double getmMinRtt() {
+    public double getMinRtt() {
         return mMinRtt;
     }
 
-    public double getmMaxRtt() {
+    public double getMaxRtt() {
         return mMaxRtt;
     }
 

@@ -13,11 +13,14 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.xiaoyezi.tools.networktest.R;
+import com.xiaoyezi.tools.networktest.analytics.Analytics;
 
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.nio.channels.SocketChannel;
 import java.util.Enumeration;
+import java.util.Timer;
+import java.util.TimerTask;
 
 /**
  * Created by jianmin on 16-7-3.
@@ -34,9 +37,27 @@ public class AnalyticsFragment extends Fragment {
 
     private SocketChannel mSocketToServer;
 
+    private Timer mTimer;
+
+    private TimerTask mTimerTask;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        mTimer = new Timer();
+
+        mTimerTask = new TimerTask() {
+            @Override
+            public void run() {
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        refresh();
+                    }
+                });
+            }
+        };
     }
 
     @Override
@@ -58,7 +79,7 @@ public class AnalyticsFragment extends Fragment {
         mRxStat = (TextView) view.findViewById(R.id.rxStat);
         mMinMaxAvg = (TextView) view.findViewById(R.id.minMaxAvg);
 
-        refresh();
+        mTimer.schedule(mTimerTask, 1000, 5000);
     }
 
     @Override
@@ -73,6 +94,10 @@ public class AnalyticsFragment extends Fragment {
 
     @Override
     public void onDestroy() {
+        if (mTimer != null) {
+            mTimer.cancel();
+        }
+
         super.onDestroy();
     }
 
@@ -128,6 +153,11 @@ public class AnalyticsFragment extends Fragment {
         } else {
             mSocketIpAddr.setText(mSocketToServer.socket().getLocalAddress().getHostAddress());
         }
+
+        mTxStat.setText(Analytics.getInstance().getSentCount() + "");
+        mRxStat.setText(Analytics.getInstance().getRecvCount() + "");
+
+        mMinMaxAvg.setText("SENDING - MIN[" + Analytics.getInstance().getMinRtt() + "ms]  MAX[" + Analytics.getInstance().getMaxRtt() + "ms]");
     }
 
     private String getLocalIpAddress(String netType) {
