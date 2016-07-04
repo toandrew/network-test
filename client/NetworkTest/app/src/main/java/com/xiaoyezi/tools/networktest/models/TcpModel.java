@@ -69,15 +69,15 @@ public class TcpModel extends NetModel {
                 Log.d(TAG, "sendData:" + mSocket);
 
                 // build data
-                byte[] buf = Utils.buildsendPacket((new Date()).getTime(), data);
+                JSONObject sendData = Utils.buildsendPacket((new Date()).getTime(), data);
 
                 // send it
-                mOutputStream.write(buf);
+                mOutputStream.write(sendData.toString().getBytes());
 
                 // change sent packet count
                 mAnalytics.setSentCount(++mSentCount);
 
-                Log.d(TAG, "send Data:" + buf.toString() + "[" + mSentCount + "]");
+                Log.d(TAG, "send Data:" + sendData.toString() + "[" + mSentCount + "]");
             } else {
                 Log.d(TAG, "Send data failed for mOutputStream is null!");
             }
@@ -98,10 +98,15 @@ public class TcpModel extends NetModel {
                 if (len > 0) {
                     mAnalytics.setRecvCount(++mReceivedCount);
 
-                    byte[] buf = Utils.buildRecvPacket(mBuf, (new Date()).getTime());
+                    long t = (new Date()).getTime();
+                    JSONObject recvData = Utils.buildRecvPacket(mBuf, t);
+                    long rtt = t - recvData.getLong("clientSentTime");
+                    mAnalytics.updateRtt(rtt);
+
+                    Log.d(TAG, "TCP recvData:[" + recvData.toString() + "]RTT[" + rtt + "]");
 
                     // Save it
-                    mAnalytics.saveLog(buf);
+                    mAnalytics.saveLog(recvData);
                 }
 
                 Log.d(TAG, "received data len: [" + len + "]recvCount[" + mReceivedCount + "]");

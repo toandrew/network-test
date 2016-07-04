@@ -5,6 +5,8 @@ import android.util.Log;
 import com.xiaoyezi.tools.networktest.analytics.Analytics;
 import com.xiaoyezi.tools.networktest.utils.Utils;
 
+import org.json.JSONObject;
+
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
@@ -69,7 +71,7 @@ public class UdpModel extends NetModel {
         DatagramPacket dp = null;
 
         try {
-            byte[] buf = Utils.buildsendPacket((new Date()).getTime(), data);
+            byte[] buf = Utils.buildsendPacket((new Date()).getTime(), data).toString().getBytes();
 
             dp = new DatagramPacket(buf, buf.length, InetAddress.getByName(getHost()), Integer.parseInt(getPort()));
             mSocket.send(dp);
@@ -92,10 +94,15 @@ public class UdpModel extends NetModel {
             if (dp.getLength() > 0) {
                 mAnalytics.setRecvCount(++mReceivedCount);
 
-                byte[] buf = Utils.buildRecvPacket(dp.getData(), (new Date()).getTime());
+                long t = (new Date()).getTime();
+                JSONObject data = Utils.buildRecvPacket(dp.getData(), t);
+                long rtt = t - data.getLong("clientSentTime");
+                mAnalytics.updateRtt(rtt);
+
+                Log.d(TAG, "TCP recvData:[" + data.toString() + "]RTT[" + rtt + "]");
 
                 // Save it
-                mAnalytics.saveLog(buf);
+                mAnalytics.saveLog(data);
             }
         }catch (Exception e) {
             e.printStackTrace();

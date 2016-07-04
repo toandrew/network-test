@@ -1,5 +1,7 @@
 package com.xiaoyezi.tools.networktest.analytics;
 
+import org.json.JSONObject;
+
 /**
  * Created by jianmin on 16-7-2.
  */
@@ -13,7 +15,7 @@ public class Analytics {
     private float mLoss = 0;
 
     // mRtt = (mClientRecvTime - mClientSentTime) - (mServerRespTime - mServerRecvTime)
-    private double mMinRtt = 0;
+    private double mMinRtt = Long.MAX_VALUE;
     private double mMaxRtt = 0;
 
     private Analytics() {
@@ -34,7 +36,7 @@ public class Analytics {
         // mLoss = （mSentCount - mRecvCount)/mSentCount
         mLoss = 0;
 
-        mMinRtt = 0;
+        mMinRtt = Long.MAX_VALUE;
         mMaxRtt = 0;
     }
 
@@ -80,6 +82,6 @@ public class Analytics {
         }
     }
 
-    public void saveLog(byte[] buf) {
+    public void saveLog(JSONObject log) {
     }
 }

@@ -18,7 +18,7 @@ public class Utils {
         return payLoad;
     }
 
-    public static byte[] buildsendPacket(long clientSentTime, String data) {
+    public static JSONObject buildsendPacket(long clientSentTime, String data) {
         Utils.packetIndex++;
 
         JSONObject packet = new JSONObject();
@@ -31,10 +31,10 @@ public class Utils {
             e.printStackTrace();
         }
 
-        return packet.toString().getBytes();
+        return packet;
     }
 
-    public static byte[] buildRecvPacket(byte[] recvBuf, long clientRecvTime) {
+    public static JSONObject buildRecvPacket(byte[] recvBuf, long clientRecvTime) {
         JSONObject packet = null;
 
         try {
@@ -50,6 +50,6 @@ public class Utils {
 
         Log.d(TAG, "recv packet:" + packet.toString());
 
-        return packet.toString().getBytes();
+        return packet;
     }
 }

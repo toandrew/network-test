@@ -34,6 +34,7 @@ public class AnalyticsFragment extends Fragment {
     private TextView mTxStat;
     private TextView mRxStat;
     private TextView mMinMaxAvg;
+    private TextView mLoss;
 
     private SocketChannel mSocketToServer;
 
@@ -78,6 +79,7 @@ public class AnalyticsFragment extends Fragment {
         mTxStat = (TextView) view.findViewById(R.id.txStat);
         mRxStat = (TextView) view.findViewById(R.id.rxStat);
         mMinMaxAvg = (TextView) view.findViewById(R.id.minMaxAvg);
+        mLoss = (TextView) view.findViewById(R.id.loss);
 
         mTimer.schedule(mTimerTask, 1000, 5000);
     }
@@ -157,7 +159,13 @@ public class AnalyticsFragment extends Fragment {
         mTxStat.setText(Analytics.getInstance().getSentCount() + "");
         mRxStat.setText(Analytics.getInstance().getRecvCount() + "");
 
-        mMinMaxAvg.setText("SENDING - MIN[" + Analytics.getInstance().getMinRtt() + "ms]  MAX[" + Analytics.getInstance().getMaxRtt() + "ms]");
+        long loss = 0;
+        if (Analytics.getInstance().getSentCount() > 0) {
+            loss = (Analytics.getInstance().getSentCount() - Analytics.getInstance().getRecvCount()) / Analytics.getInstance().getSentCount();
+        }
+        mLoss.setText(loss*100 + "%");
+
+        mMinMaxAvg.setText("MIN[" + (Analytics.getInstance().getMinRtt() >= Long.MAX_VALUE ? "0" : Analytics.getInstance().getMinRtt())  + "ms]  MAX[" + Analytics.getInstance().getMaxRtt() + "ms]");
     }
 
     private String getLocalIpAddress(String netType) {

@@ -2,6 +2,7 @@ package com.xiaoyezi.tools.networktest.ui;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -111,6 +112,9 @@ public class TestFragment extends Fragment {
                 updateTransportState();
             }
         });
+
+        setPreferredTransportMode(mNetManager.getCurrentTransportState());
+        updateTransportState();
     }
 
     @Override
@@ -228,10 +232,12 @@ public class TestFragment extends Fragment {
     private void updateTransportState() {
         if (canStart()) {
             mSendButton.setText(R.string.button_start);
+            mSendButton.setTextColor(Color.BLACK);
         }
 
         if (canStop()) {
             mSendButton.setText(R.string.button_stop);
+            mSendButton.setTextColor(Color.RED);
         }
     }
 }
