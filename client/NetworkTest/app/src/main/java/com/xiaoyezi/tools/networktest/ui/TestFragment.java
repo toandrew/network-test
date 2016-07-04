@@ -20,8 +20,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.xiaoyezi.tools.networktest.R;
+import com.xiaoyezi.tools.networktest.analytics.Analytics;
 import com.xiaoyezi.tools.networktest.controllers.NetManager;
 import com.xiaoyezi.tools.networktest.utils.Constants;
+
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class TestFragment extends Fragment {
     private static final String TAG = "TestFragment";
@@ -35,12 +39,30 @@ public class TestFragment extends Fragment {
 
     private Constants.TRANSPORT_TYPE mPreferredTransportMode = Constants.TRANSPORT_TYPE.TYPE_TCP;
 
+    private Timer mTimer;
+
+    private TimerTask mTimerTask;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         mNetManager = new NetManager(getActivity());
         mNetManager.start();
+
+        mTimer = new Timer();
+
+        mTimerTask = new TimerTask() {
+            @Override
+            public void run() {
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        updateTransportState();
+                    }
+                });
+            }
+        };
     }
 
     @Override
@@ -114,7 +136,8 @@ public class TestFragment extends Fragment {
         });
 
         setPreferredTransportMode(mNetManager.getCurrentTransportState());
-        updateTransportState();
+
+        mTimer.schedule(mTimerTask, 1000, 3000);
     }
 
     @Override
@@ -145,6 +168,10 @@ public class TestFragment extends Fragment {
     public void onDestroy() {
         super.onDestroy();
         Log.d(TAG, "onDestroy!!!!");
+
+        if (mTimer != null) {
+            mTimer.cancel();
+        }
 
         mNetManager.close();
     }
@@ -236,7 +263,8 @@ public class TestFragment extends Fragment {
         }
 
         if (canStop()) {
-            mSendButton.setText(R.string.button_stop);
+            String info = "(" + Analytics.getInstance().getRecvCount() + "/" + Analytics.getInstance().getSentCount() + ")";
+            mSendButton.setText(getString(R.string.button_stop) + info);
             mSendButton.setTextColor(Color.RED);
         }
     }
