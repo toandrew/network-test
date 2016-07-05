@@ -6,6 +6,7 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
@@ -28,6 +29,8 @@ public class LogFragment extends Fragment {
 
     private TextView mNoLogsView;
 
+    private Button mDelButton;
+
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
@@ -41,6 +44,19 @@ public class LogFragment extends Fragment {
         mListView = (ListView) view.findViewById(R.id.file_logs);
 
         mNoLogsView = (TextView) view.findViewById(R.id.no_logs);
+
+        mDelButton = (Button) view.findViewById(R.id.delBtn);
+
+        mDelButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Utils.deleteFile(Utils.getLogPath(Constants.TRANSPORT_TYPE.TYPE_TCP));
+                Utils.deleteFile(Utils.getLogPath(Constants.TRANSPORT_TYPE.TYPE_UDP));
+                Utils.deleteFile(Utils.getLogPath(Constants.TRANSPORT_TYPE.TYPE_RUDP));
+
+                updateListView();
+            }
+        });
 
         updateListView();
     }
@@ -102,11 +118,13 @@ public class LogFragment extends Fragment {
             mListView.setVisibility(View.VISIBLE);
             mNoLogsView.setVisibility(View.GONE);
             mListView.setAdapter(adapter);
+            mDelButton.setVisibility(View.VISIBLE);
 
             return;
         }
 
         mNoLogsView.setVisibility(View.VISIBLE);
         mListView.setVisibility(View.GONE);
+        mDelButton.setVisibility(View.GONE);
     }
 }

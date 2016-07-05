@@ -19,4 +19,6 @@
     <string name="hint_port">50000</string>
     <string name="button_start">开始</string>
     <string name="button_stop">停止</string>
+
+    <string name="button_delete">删除所有日志文件</string>
 </resources>
