@@ -3,6 +3,7 @@ package com.xiaoyezi.tools.networktest.models;
 import android.util.Log;
 
 import com.xiaoyezi.tools.networktest.analytics.Analytics;
+import com.xiaoyezi.tools.networktest.utils.Constants;
 import com.xiaoyezi.tools.networktest.utils.Utils;
 
 import org.json.JSONObject;
@@ -22,10 +23,6 @@ public class UdpModel extends NetModel {
     private byte[] mBuf = new byte[1024];
 
     private DatagramSocket mSocket = null;
-
-    private DatagramPacket mPacket = null;
-
-    private InetSocketAddress mSocketAddress = null;
 
     private Analytics mAnalytics = Analytics.getInstance();
 
@@ -73,7 +70,7 @@ public class UdpModel extends NetModel {
         DatagramPacket dp = null;
 
         try {
-            byte[] buf = Utils.buildsendPacket((new Date()).getTime(), data).toString().getBytes();
+            byte[] buf = Utils.buildSendPacket((new Date()).getTime(), data).toString().getBytes();
 
             dp = new DatagramPacket(buf, buf.length, InetAddress.getByName(getHost()), Integer.parseInt(getPort()));
             mSocket.send(dp);
@@ -104,8 +101,8 @@ public class UdpModel extends NetModel {
 
                 Log.d(TAG, "TCP recvData:[" + data.toString() + "]RTT[" + rtt + "]");
 
-                // Save it
-                mAnalytics.saveLog(data);
+                // Save it?
+                mAnalytics.saveLog(Constants.TRANSPORT_TYPE.TYPE_UDP, data);
             }
         }catch (Exception e) {
             e.printStackTrace();

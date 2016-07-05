@@ -69,6 +69,11 @@ public abstract class NetModel {
         return 0;
     }
 
+    /**
+     * Whether it's connected
+     *
+     * @return
+     */
     public boolean isConnected() {
         return false;
     }

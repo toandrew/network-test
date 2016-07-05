@@ -104,6 +104,7 @@ public class TestFragment extends Fragment {
                 setPreferredTransportMode(Constants.TRANSPORT_TYPE.TYPE_TCP);
             }
         });
+        mSpinner.setSelection(settings.getInt("type", 0));
 
         mSendButton = (Button) mView.findViewById(R.id.buttonSend);
         mSendButton.setOnClickListener(new View.OnClickListener() {
@@ -156,6 +157,7 @@ public class TestFragment extends Fragment {
         editor.putString("host", host);
         editor.putString("port", port);
         editor.putString("dataText", dataText);
+        editor.putInt("type", mSpinner.getSelectedItemPosition());
 
         // Commit the edits!
         editor.commit();

@@ -3,6 +3,7 @@ package com.xiaoyezi.tools.networktest.models;
 import android.util.Log;
 
 import com.xiaoyezi.tools.networktest.analytics.Analytics;
+import com.xiaoyezi.tools.networktest.utils.Constants;
 import com.xiaoyezi.tools.networktest.utils.Utils;
 
 import org.json.JSONObject;
@@ -21,9 +22,9 @@ public class TcpModel extends NetModel {
 
     private Analytics mAnalytics = Analytics.getInstance();
 
-    Socket mSocket = null;
-    DataOutputStream mOutputStream = null;
-    DataInputStream mInputStream = null;
+    private Socket mSocket = null;
+    private DataOutputStream mOutputStream = null;
+    private DataInputStream mInputStream = null;
 
     byte[] mBuf = new byte[1024];
 
@@ -75,7 +76,7 @@ public class TcpModel extends NetModel {
                 Log.d(TAG, "sendData:" + mSocket);
 
                 // build data
-                JSONObject sendData = Utils.buildsendPacket((new Date()).getTime(), data);
+                JSONObject sendData = Utils.buildSendPacket((new Date()).getTime(), data);
                 int len = sendData.toString().getBytes().length;
 
                 // send it
@@ -108,7 +109,6 @@ public class TcpModel extends NetModel {
 
                 if (len > 0) {
                     Utils.fullyRead(mInputStream, mBuf, len);
-                    //mInputStream.readFully(mBuf, 0, len);
                     mAnalytics.setRecvCount(++mReceivedCount);
 
                     long t = (new Date()).getTime();
@@ -118,8 +118,8 @@ public class TcpModel extends NetModel {
 
                     Log.d(TAG, "TCP recvData:len[" + len + "][" + recvData.toString() + "]RTT[" + rtt + "]");
 
-                    // Save it
-                    mAnalytics.saveLog(recvData);
+                    // Save it?
+                    mAnalytics.saveLog(Constants.TRANSPORT_TYPE.TYPE_TCP, recvData);
                 }
 
                 Log.d(TAG, "received data len: [" + len + "]recvCount[" + mReceivedCount + "]");

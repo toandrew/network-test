@@ -11,12 +11,13 @@ import com.xiaoyezi.tools.networktest.models.RudpModel;
 import com.xiaoyezi.tools.networktest.models.TcpModel;
 import com.xiaoyezi.tools.networktest.models.UdpModel;
 import com.xiaoyezi.tools.networktest.utils.Constants;
+import com.xiaoyezi.tools.networktest.utils.Utils;
 
 import java.io.IOException;
 
 /**
  * This service will be used to send data according to current requested transport type.
- * <p/>
+ *
  * Please note,
  * There's only one thread which will be used to contain all net models' action.
  */
@@ -146,11 +147,13 @@ public class NetModelService extends Service implements Runnable {
                         ret = mCurrentNetModel.init();
                         if (ret < 0) {
                             Log.e(TAG, "Failed to init net model. wait for next around!");
+
                             try {
                                 Thread.sleep(3000);
-                            }catch(Exception e) {
+                            } catch(Exception e) {
                                 e.printStackTrace();
                             }
+
                             continue;
                         }
                     }
@@ -238,18 +241,24 @@ public class NetModelService extends Service implements Runnable {
                 mCurrentNetModel = new UdpModel(host, port);
 
                 Log.d(TAG, "initNetModel: TYPE_UDP!");
+
+                Utils.deleteFile(Utils.getSDPath() +  '/' + Constants.UDP_DEFAULT_FILE);
                 break;
 
             case TYPE_TCP:
                 mCurrentNetModel = new TcpModel(host, port);
 
                 Log.d(TAG, "initNetModel: TYPE_TCP!");
+
+                Utils.deleteFile(Utils.getSDPath() + '/' + Constants.TCP_DEFAULT_FILE);
                 break;
 
             case TYPE_RUDP:
                 mCurrentNetModel = new RudpModel(host, port);
 
                 Log.d(TAG, "initNetModel: TYPE_RUDP!");
+
+                Utils.deleteFile(Utils.getSDPath() + '/' + Constants.RUDP_DEFAULT_FILE);
                 break;
         }
     }
@@ -283,6 +292,11 @@ public class NetModelService extends Service implements Runnable {
         return ret;
     }
 
+    /**
+     * Send data
+     *
+     * @param data
+     */
     private void sendData(String data) {
         if (mCurrentNetModel != null) {
             mCurrentNetModel.sendData(data);

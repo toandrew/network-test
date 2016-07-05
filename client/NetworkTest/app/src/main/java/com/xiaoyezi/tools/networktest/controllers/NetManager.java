@@ -21,9 +21,9 @@ public class NetManager {
 
     private boolean mIsBind = false;
 
-    Activity mActivity;
+    private Activity mActivity;
 
-    NetModelService.NetBinder mBinder;
+    private NetModelService.NetBinder mBinder;
 
     public NetManager(Activity activity) {
         mActivity = activity;

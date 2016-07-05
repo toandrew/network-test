@@ -115,6 +115,9 @@ public class AnalyticsFragment extends Fragment {
         super.onDestroy();
     }
 
+    /**
+     * Refresh ui view
+     */
     private void refresh() {
         ConnectivityManager conMgr = (ConnectivityManager) getActivity().getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo netInfo = conMgr.getActiveNetworkInfo();
@@ -173,12 +176,18 @@ public class AnalyticsFragment extends Fragment {
 
         float loss = 0;
         loss = Analytics.getInstance().getLoss();
-        mLoss.setText(mNumberFormat.format(loss*100) + "%");
+        mLoss.setText(mNumberFormat.format(loss * 100) + "%");
 
         mMinMaxAvg.setText("MIN[" + (Analytics.getInstance().getMinRtt() >= Long.MAX_VALUE ? "0" : Analytics.getInstance().getMinRtt())
                 + "ms]  MAX[" + Analytics.getInstance().getMaxRtt() + "ms] AVG[" + mNumberFormat.format(Analytics.getInstance().getAvgRtt()) + "ms] current[" + Analytics.getInstance().getCurrentRtt() + "ms]");
     }
 
+    /**
+     * Get local ip address
+     *
+     * @param netType
+     * @return
+     */
     private String getLocalIpAddress(String netType) {
         try {
             Enumeration<NetworkInterface> netInterfaces = NetworkInterface.getNetworkInterfaces();
