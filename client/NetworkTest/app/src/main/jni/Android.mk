@@ -4,7 +4,12 @@ include $(CLEAR_VARS)
 
 LOCAL_MODULE := xenet_jni
 LOCAL_C_INCLUDES := $(LOCAL_PATH)/enet/include
-LOCAL_SRC_FILES := com_xiaoyezi_enet_Host.c
+LOCAL_SRC_FILES := \
+    com_xiaoyezi_enet_Host.c \
+    com_xiaoyezi_enet_Event.c \
+    com_xiaoyezi_enet_Packet.c \
+    com_xiaoyezi_enet_Peer.c
+
 LOCAL_STATIC_LIBRARIES +=  xenet
 LOCAL_LDLIBS +=  -llog -ldl
 

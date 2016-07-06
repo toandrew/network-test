@@ -42,7 +42,18 @@ JNIEXPORT jobject JNICALL Java_com_xiaoyezi_enet_Host_create
 JNIEXPORT jobject JNICALL Java_com_xiaoyezi_enet_Host_connect
         (JNIEnv *env, jclass cls, jobject ctx, jint address, jint port, jint channelCount, jint data) {
 
-    return NULL;
+	ENetHost *host = (ENetHost *) (*env)->GetDirectBufferAddress(env, ctx);
+	if (host != NULL) {
+		const ENetAddress addr = { (enet_uint32) address, (enet_uint16) port };
+		ENetPeer *peer = enet_host_connect(host, &addr, channelCount, data);
+		if (peer == NULL) {
+			(*env)->ThrowNew(env, (*env)->FindClass(env, "com/xiaoyezi/enet/EnetException"), "failed to connect");
+			return NULL;
+		}
+		return (*env)->NewDirectByteBuffer(env, peer, sizeof(ENetPeer));
+	}
+
+	return NULL;
 }
 
 /*
@@ -52,7 +63,11 @@ JNIEXPORT jobject JNICALL Java_com_xiaoyezi_enet_Host_connect
  */
 JNIEXPORT void JNICALL Java_com_xiaoyezi_enet_Host_broadcast
         (JNIEnv *env, jclass cls, jobject ctx, jint channel, jobject packet) {
-
+    ENetHost *host = (ENetHost *) (*env)->GetDirectBufferAddress(env, ctx);
+    ENetPacket *p = (ENetPacket *) (*env)->GetDirectBufferAddress(env, packet);
+    if (host != NULL && p != NULL) {
+        enet_host_broadcast(host, channel, p);
+    }
 }
 
 /*
@@ -62,7 +77,10 @@ JNIEXPORT void JNICALL Java_com_xiaoyezi_enet_Host_broadcast
  */
 JNIEXPORT void JNICALL Java_com_xiaoyezi_enet_Host_channel_1limit
         (JNIEnv *env, jclass cls, jobject ctx, jint channelLimit) {
-
+	ENetHost *host = (ENetHost *) (*env)->GetDirectBufferAddress(env, ctx);
+	if (host != NULL) {
+		enet_host_channel_limit(host, channelLimit);
+	}
 }
 
 /*
@@ -72,7 +90,10 @@ JNIEXPORT void JNICALL Java_com_xiaoyezi_enet_Host_channel_1limit
  */
 JNIEXPORT void JNICALL Java_com_xiaoyezi_enet_Host_bandwidth_1limit
         (JNIEnv *env, jclass cls, jobject ctx, jint inbw, jint outbw) {
-
+	ENetHost *host = (ENetHost *) (*env)->GetDirectBufferAddress(env, ctx);
+	if (host != NULL) {
+		enet_host_bandwidth_limit(host, inbw, outbw);
+	}
 }
 
 /*
@@ -82,7 +103,10 @@ JNIEXPORT void JNICALL Java_com_xiaoyezi_enet_Host_bandwidth_1limit
  */
 JNIEXPORT void JNICALL Java_com_xiaoyezi_enet_Host_flush
         (JNIEnv *env, jclass cls, jobject ctx) {
-
+	ENetHost *host = (ENetHost *) (*env)->GetDirectBufferAddress(env, ctx);
+	if (host != NULL) {
+		enet_host_flush(host);
+	}
 }
 
 /*
@@ -92,7 +116,23 @@ JNIEXPORT void JNICALL Java_com_xiaoyezi_enet_Host_flush
  */
 JNIEXPORT jint JNICALL Java_com_xiaoyezi_enet_Host_checkEvents
         (JNIEnv *env, jclass cls, jobject ctx, jobject ev) {
+	ENetHost *host = (ENetHost *) (*env)->GetDirectBufferAddress(env, ctx);
+	if (host != NULL) {
+		ENetEvent *event = NULL;
+		if (ev != NULL) {
+			event = (ENetEvent *) (*env)->GetDirectBufferAddress(env, ev);
+		}
 
+		int ret = enet_host_check_events(host, event);
+		if (ret < 0) {
+			(*env)->ThrowNew(env, (*env)->FindClass(env, "com/xiaoyezi/enet/EnetException"), "failed to check events");
+			return -1;
+		}
+
+		return ret;
+	}
+
+	return 0;
 }
 
 /*
@@ -102,7 +142,23 @@ JNIEXPORT jint JNICALL Java_com_xiaoyezi_enet_Host_checkEvents
  */
 JNIEXPORT jint JNICALL Java_com_xiaoyezi_enet_Host_service
         (JNIEnv *env, jclass cls, jobject ctx, jint timeout, jobject ev) {
+	ENetHost *host = (ENetHost *) (*env)->GetDirectBufferAddress(env, ctx);
+	if (host != NULL) {
+		ENetEvent *event = NULL;
+		if (ev != NULL) {
+			event = (ENetEvent *) (*env)->GetDirectBufferAddress(env, ev);
+		}
 
+		int ret = enet_host_service(host, event, timeout);
+		if (ret < 0) {
+			(*env)->ThrowNew(env, (*env)->FindClass(env, "com/xiaoyezi/enet/EnetException"), "failed to service host");
+			return -1;
+		}
+
+		return ret;
+	}
+
+	return 0;
 }
 
 /*
@@ -112,5 +168,8 @@ JNIEXPORT jint JNICALL Java_com_xiaoyezi_enet_Host_service
  */
 JNIEXPORT void JNICALL Java_com_xiaoyezi_enet_Host_destroy
         (JNIEnv *env, jclass cls, jobject ctx) {
-
+	ENetHost *host = (ENetHost *) (*env)->GetDirectBufferAddress(env, ctx);
+	if (host != NULL) {
+		enet_host_destroy(host);
+	}
 }
