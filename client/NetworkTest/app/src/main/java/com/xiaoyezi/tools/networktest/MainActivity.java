@@ -17,8 +17,14 @@ import com.ogaclejapan.smarttablayout.utils.v4.FragmentPagerItems;
 import com.xiaoyezi.tools.networktest.ui.AnalyticsFragment;
 import com.xiaoyezi.tools.networktest.ui.LogFragment;
 import com.xiaoyezi.tools.networktest.ui.TestFragment;
+import com.xiaoyezi.tools.networktest.utils.Constants;
 
 public class MainActivity extends AppCompatActivity {
+
+    static {
+        System.loadLibrary(Constants.ENET_LIB_NAME);
+    }
+
     private static final String TAG = "MainActivity";
 
     // Objects for WAKE-LOCK

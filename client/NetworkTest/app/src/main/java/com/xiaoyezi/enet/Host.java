@@ -14,10 +14,6 @@ import java.util.concurrent.TimeUnit;
 public class Host {
     private static final String TAG = "Host";
 
-    static {
-        System.loadLibrary(Constants.ENET_LIB_NAME);
-    }
-
     ByteBuffer mNativeState;
 
     static int addressToInt(InetAddress address) throws EnetException {
