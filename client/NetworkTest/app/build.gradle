@@ -4,6 +4,12 @@ android {
     compileSdkVersion 23
     buildToolsVersion "23.0.3"
 
+//    externalNativeBuild{
+//        ndkBuild{
+//            path "Android.mk"
+//        }
+//    }
+
     defaultConfig {
         applicationId "com.xiaoyezi.tools.networktest"
         minSdkVersion 15
@@ -11,15 +17,28 @@ android {
         versionCode 1
         versionName "1.0"
 
-        ndk {
-            moduleName "enet_jni"
-            abiFilters "armeabi", "armeabi-v7a", "x86"
-        }
+//        ndk {
+//            moduleName "xenet_jni"
+//            abiFilters "armeabi", "armeabi-v7a", "x86"
+//        }
+
+//        ndkBuild {
+//            arguments "NDK_APPLICATION_MK:=Application.mk"
+//            abiFilters "armeabi-v7a", "armeabi"
+//        }
     }
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    sourceSets {
+        //目录结构
+        main {
+            jniLibs.srcDirs = ['src/main/libs']
+            jni.srcDirs = []
         }
     }
 }

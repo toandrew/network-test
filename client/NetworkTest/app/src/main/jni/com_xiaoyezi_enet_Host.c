@@ -6,6 +6,13 @@
 
 #include "enet/enet.h"
 #include "com_xiaoyezi_enet_Host.h"
+
+#ifdef DEBUG
+#define debug(fmt,args...) printf(fmt, ##args)
+#else
+#define debug(fmt,args...)
+#endif
+
 /*
  * Class:     com_xiaoyezi_enet_Host
  * Method:    create
@@ -19,10 +26,11 @@ JNIEXPORT jobject JNICALL Java_com_xiaoyezi_enet_Host_create
     debug("create addr: { %08x, %d }\n", addr.host, addr.port);
     ENetHost *host = enet_host_create(&addr, peerCount, channelCount, inbw, outbw);
     if (host == NULL) {
-        (*env)->ThrowNew(env, (*env)->FindClass(env, "org/bespin/enet/EnetException"),
+        (*env)->ThrowNew(env, (*env)->FindClass(env, "com/xiaoyezi/enet/EnetException"),
                          "failed to create enet host");
         return NULL;
     }
+
     return (*env)->NewDirectByteBuffer(env, host, sizeof(ENetHost));
 }
 
@@ -32,8 +40,9 @@ JNIEXPORT jobject JNICALL Java_com_xiaoyezi_enet_Host_create
  * Signature: (Ljava/nio/ByteBuffer;IIII)Ljava/nio/ByteBuffer;
  */
 JNIEXPORT jobject JNICALL Java_com_xiaoyezi_enet_Host_connect
-        (JNIEnv *, jclass, jobject, jint, jint, jint, jint) {
+        (JNIEnv *env, jclass cls, jobject ctx, jint address, jint port, jint channelCount, jint data) {
 
+    return NULL;
 }
 
 /*
@@ -42,7 +51,7 @@ JNIEXPORT jobject JNICALL Java_com_xiaoyezi_enet_Host_connect
  * Signature: (Ljava/nio/ByteBuffer;ILjava/nio/ByteBuffer;)V
  */
 JNIEXPORT void JNICALL Java_com_xiaoyezi_enet_Host_broadcast
-        (JNIEnv *, jclass, jobject, jint, jobject) {
+        (JNIEnv *env, jclass cls, jobject ctx, jint channel, jobject packet) {
 
 }
 
@@ -52,7 +61,7 @@ JNIEXPORT void JNICALL Java_com_xiaoyezi_enet_Host_broadcast
  * Signature: (Ljava/nio/ByteBuffer;I)V
  */
 JNIEXPORT void JNICALL Java_com_xiaoyezi_enet_Host_channel_1limit
-        (JNIEnv *, jclass, jobject, jint) {
+        (JNIEnv *env, jclass cls, jobject ctx, jint channelLimit) {
 
 }
 
@@ -62,7 +71,7 @@ JNIEXPORT void JNICALL Java_com_xiaoyezi_enet_Host_channel_1limit
  * Signature: (Ljava/nio/ByteBuffer;II)V
  */
 JNIEXPORT void JNICALL Java_com_xiaoyezi_enet_Host_bandwidth_1limit
-        (JNIEnv *, jclass, jobject, jint, jint) {
+        (JNIEnv *env, jclass cls, jobject ctx, jint inbw, jint outbw) {
 
 }
 
@@ -72,7 +81,7 @@ JNIEXPORT void JNICALL Java_com_xiaoyezi_enet_Host_bandwidth_1limit
  * Signature: (Ljava/nio/ByteBuffer;)V
  */
 JNIEXPORT void JNICALL Java_com_xiaoyezi_enet_Host_flush
-        (JNIEnv *, jclass, jobject) {
+        (JNIEnv *env, jclass cls, jobject ctx) {
 
 }
 
@@ -82,7 +91,7 @@ JNIEXPORT void JNICALL Java_com_xiaoyezi_enet_Host_flush
  * Signature: (Ljava/nio/ByteBuffer;Ljava/nio/ByteBuffer;)I
  */
 JNIEXPORT jint JNICALL Java_com_xiaoyezi_enet_Host_checkEvents
-        (JNIEnv *, jclass, jobject, jobject) {
+        (JNIEnv *env, jclass cls, jobject ctx, jobject ev) {
 
 }
 
@@ -92,7 +101,7 @@ JNIEXPORT jint JNICALL Java_com_xiaoyezi_enet_Host_checkEvents
  * Signature: (Ljava/nio/ByteBuffer;ILjava/nio/ByteBuffer;)I
  */
 JNIEXPORT jint JNICALL Java_com_xiaoyezi_enet_Host_service
-        (JNIEnv *, jclass, jobject, jint, jobject) {
+        (JNIEnv *env, jclass cls, jobject ctx, jint timeout, jobject ev) {
 
 }
 
@@ -102,6 +111,6 @@ JNIEXPORT jint JNICALL Java_com_xiaoyezi_enet_Host_service
  * Signature: (Ljava/nio/ByteBuffer;)V
  */
 JNIEXPORT void JNICALL Java_com_xiaoyezi_enet_Host_destroy
-        (JNIEnv *, jclass, jobject) {
+        (JNIEnv *env, jclass cls, jobject ctx) {
 
 }

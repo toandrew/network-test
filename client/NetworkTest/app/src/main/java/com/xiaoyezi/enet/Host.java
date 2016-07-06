@@ -2,10 +2,6 @@ package com.xiaoyezi.enet;
 
 import com.xiaoyezi.tools.networktest.utils.Constants;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
@@ -18,11 +14,13 @@ public class Host {
         System.loadLibrary(Constants.ENET_LIB_NAME);
     }
 
-    ByteBuffer nativeState;
+    ByteBuffer mNativeState;
 
     static int addressToInt(InetAddress address) throws EnetException {
-        if (!(address instanceof Inet4Address))
+        if (!(address instanceof Inet4Address)) {
             throw new EnetException("enet only supports IPv4");
+        }
+
         ByteBuffer buf = ByteBuffer.wrap(address.getAddress());
         buf.order(ByteOrder.nativeOrder());
         return buf.getInt(0);
@@ -30,33 +28,33 @@ public class Host {
 
     public Host(InetSocketAddress address, int peerCount, int channelLimit, int incomingBandwidth, int outgoingBandwidth)
             throws EnetException {
-        nativeState = create(addressToInt(address.getAddress()), address.getPort(), peerCount, channelLimit, incomingBandwidth, outgoingBandwidth);
+        mNativeState = create(addressToInt(address.getAddress()), address.getPort(), peerCount, channelLimit, incomingBandwidth, outgoingBandwidth);
     }
 
     public Peer connect(InetSocketAddress address, int channelCount, int data)
             throws EnetException {
-        return new Peer(connect(nativeState, addressToInt(address.getAddress()), address.getPort(), channelCount, data));
+        return new Peer(connect(mNativeState, addressToInt(address.getAddress()), address.getPort(), channelCount, data));
     }
 
     public void broadcast(int channelID, Packet packet) {
-        broadcast(nativeState, channelID, packet.nativeState);
+        broadcast(mNativeState, channelID, packet.nativeState);
     }
 
     public void channelLimit(int channelLimit) {
-        channel_limit(nativeState, channelLimit);
+        channel_limit(mNativeState, channelLimit);
     }
 
     public void bandwidthLimit(int incomingBandwidth, int outgoingBandwidth) {
-        bandwidth_limit(nativeState, incomingBandwidth, outgoingBandwidth);
+        bandwidth_limit(mNativeState, incomingBandwidth, outgoingBandwidth);
     }
 
     public void flush() {
-        flush(nativeState);
+        flush(mNativeState);
     }
 
     public Event checkEvents() throws EnetException {
         Event event = new Event();
-        int ret = checkEvents(nativeState, event.nativeState);
+        int ret = checkEvents(mNativeState, event.nativeState);
         if (ret <= 0)
             return null;
         return event;
@@ -64,7 +62,7 @@ public class Host {
 
     public Event service(int timeout) throws EnetException {
         Event event = new Event();
-        int ret = service(nativeState, timeout, event.nativeState);
+        int ret = service(mNativeState, timeout, event.nativeState);
         if (ret <= 0)
             return null;
         return event;
@@ -76,7 +74,7 @@ public class Host {
 
     @Override
     protected void finalize() throws Throwable {
-        destroy(nativeState);
+        destroy(mNativeState);
         super.finalize();
     }
 
