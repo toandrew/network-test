@@ -74,3 +74,4 @@ proguard/
 *.log
 
 app/src/main/obj/
+app/src/main/libs/

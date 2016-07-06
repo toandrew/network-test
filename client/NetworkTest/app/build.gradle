@@ -17,10 +17,10 @@ android {
         versionCode 1
         versionName "1.0"
 
-        ndk {
-            moduleName "xenet_jni"
-            abiFilters "armeabi", "armeabi-v7a", "x86"
-        }
+//        ndk {
+//            moduleName "xenet_jni"
+//            abiFilters "armeabi", "armeabi-v7a", "x86"
+//        }
 
 //        ndkBuild {
 //            arguments "NDK_APPLICATION_MK:=Application.mk"
@@ -35,9 +35,8 @@ android {
     }
 
     sourceSets {
-        //目录结构
         main {
-            jniLibs.srcDirs = ['src/main/jni']
+            jniLibs.srcDirs = ['src/main/libs']
             jni.srcDirs = []
         }
     }

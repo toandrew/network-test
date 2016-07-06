@@ -1,5 +1,7 @@
 package com.xiaoyezi.enet;
 
+import android.util.Log;
+
 import com.xiaoyezi.tools.networktest.utils.Constants;
 
 import java.net.Inet4Address;
@@ -10,6 +12,8 @@ import java.nio.ByteOrder;
 import java.util.concurrent.TimeUnit;
 
 public class Host {
+    private static final String TAG = "Host";
+
     static {
         System.loadLibrary(Constants.ENET_LIB_NAME);
     }
@@ -28,6 +32,13 @@ public class Host {
 
     public Host(InetSocketAddress address, int peerCount, int channelLimit, int incomingBandwidth, int outgoingBandwidth)
             throws EnetException {
+        if (address == null) {
+            Log.d(TAG, "Host: create client!");
+            mNativeState = create(0, 0, peerCount, channelLimit, incomingBandwidth, outgoingBandwidth);
+            Log.d(TAG, "Host: after create client!" + mNativeState);
+            return;
+        }
+
         mNativeState = create(addressToInt(address.getAddress()), address.getPort(), peerCount, channelLimit, incomingBandwidth, outgoingBandwidth);
     }
 
@@ -72,9 +83,26 @@ public class Host {
         return service((int) TimeUnit.MILLISECONDS.convert(timeout, unit));
     }
 
+
+    /**
+     * Do some clean work
+     * @throws Throwable
+     */
+    public void clean() throws Throwable {
+        Log.d(TAG, "clean!!!!");
+        if (mNativeState != null) {
+            destroy(mNativeState);
+            mNativeState = null;
+        }
+    }
+
     @Override
     protected void finalize() throws Throwable {
-        destroy(mNativeState);
+        Log.d(TAG, "finalize!!!!!!!");
+        if (mNativeState != null) {
+            destroy(mNativeState);
+        }
+
         super.finalize();
     }
 

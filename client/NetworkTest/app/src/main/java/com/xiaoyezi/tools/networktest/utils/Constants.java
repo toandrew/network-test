@@ -7,7 +7,7 @@ import org.json.JSONObject;
  * Created by jianmin on 16-6-30.
  */
 public class Constants {
-    public static final String ENET_LIB_NAME = "xenet";
+    public static final String ENET_LIB_NAME = "xenet_jni";
 
     public enum TRANSPORT_TYPE {
         TYPE_NONE,

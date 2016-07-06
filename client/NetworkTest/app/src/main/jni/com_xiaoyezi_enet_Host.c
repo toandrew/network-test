@@ -21,10 +21,16 @@
 JNIEXPORT jobject JNICALL Java_com_xiaoyezi_enet_Host_create
         (JNIEnv *env, jclass cls, jint address, jint port, jint peerCount, jint channelCount,
          jint inbw, jint outbw) {
-
     const ENetAddress addr = {(enet_uint32) address, (enet_uint16) port};
-    debug("create addr: { %08x, %d }\n", addr.host, addr.port);
-    ENetHost *host = enet_host_create(&addr, peerCount, channelCount, inbw, outbw);
+    ENetHost *host = NULL;
+
+    if (port == 0) {
+        host = enet_host_create(NULL, peerCount, channelCount, inbw, outbw);
+    } else {
+        debug("create addr: { %08x, %d }\n", addr.host, addr.port);
+        host = enet_host_create(&addr, peerCount, channelCount, inbw, outbw);
+    }
+
     if (host == NULL) {
         (*env)->ThrowNew(env, (*env)->FindClass(env, "com/xiaoyezi/enet/EnetException"),
                          "failed to create enet host");
