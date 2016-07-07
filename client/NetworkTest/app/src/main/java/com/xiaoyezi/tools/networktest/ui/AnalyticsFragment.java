@@ -1,6 +1,8 @@
 package com.xiaoyezi.tools.networktest.ui;
 
 import android.content.Context;
+import android.graphics.Color;
+import android.graphics.Typeface;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
@@ -13,6 +15,15 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.github.mikephil.charting.charts.LineChart;
+import com.github.mikephil.charting.components.Legend;
+import com.github.mikephil.charting.components.XAxis;
+import com.github.mikephil.charting.components.YAxis;
+import com.github.mikephil.charting.data.Entry;
+import com.github.mikephil.charting.data.LineData;
+import com.github.mikephil.charting.data.LineDataSet;
+import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
+import com.github.mikephil.charting.utils.ColorTemplate;
 import com.xiaoyezi.tools.networktest.R;
 import com.xiaoyezi.tools.networktest.analytics.Analytics;
 
@@ -45,6 +56,9 @@ public class AnalyticsFragment extends Fragment {
     private Timer mTimer;
 
     NumberFormat mNumberFormat;
+
+    private LineChart mChart;
+    protected Typeface mTfLight;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -85,7 +99,9 @@ public class AnalyticsFragment extends Fragment {
                     }
                 });
             }
-        }, 1000, 1000);
+        }, 1000, 100);
+
+        initRealtimeLineChart(view);
     }
 
     @Override
@@ -108,6 +124,10 @@ public class AnalyticsFragment extends Fragment {
             mTimer.cancel();
             mTimer = null;
         }
+
+        if (mChart != null) {
+            mChart.clear();
+        }
     }
 
     @Override
@@ -119,6 +139,10 @@ public class AnalyticsFragment extends Fragment {
      * Refresh ui view
      */
     private void refresh() {
+        if (getActivity() == null || getActivity().getApplicationContext() == null) {
+            return;
+        }
+
         ConnectivityManager conMgr = (ConnectivityManager) getActivity().getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo netInfo = conMgr.getActiveNetworkInfo();
 
@@ -180,6 +204,11 @@ public class AnalyticsFragment extends Fragment {
 
         mMinMaxAvg.setText("MIN[" + (Analytics.getInstance().getMinRtt() >= Long.MAX_VALUE ? "0" : Analytics.getInstance().getMinRtt())
                 + "ms]  MAX[" + Analytics.getInstance().getMaxRtt() + "ms] AVG[" + mNumberFormat.format(Analytics.getInstance().getAvgRtt()) + "ms] current[" + Analytics.getInstance().getCurrentRtt() + "ms]");
+
+        // update chart
+        if (Analytics.getInstance().getCurrentRtt() > 0) {
+            addEntry();
+        }
     }
 
     /**
@@ -210,5 +239,123 @@ public class AnalyticsFragment extends Fragment {
         }
 
         return null;
+    }
+
+    /**
+     * Init chart
+     *
+     * @param view
+     */
+    private void initRealtimeLineChart(View view) {
+        mChart = (LineChart) view.findViewById(R.id.chart1);
+        //mChart.setOnChartValueSelectedListener(this);
+
+        // no description text
+        mChart.setDescription("");
+        mChart.setNoDataTextDescription("You need to provide data for the chart.");
+
+        // enable touch gestures
+        mChart.setTouchEnabled(true);
+
+        // enable scaling and dragging
+        mChart.setDragEnabled(true);
+        mChart.setScaleEnabled(true);
+        mChart.setDrawGridBackground(false);
+
+        // if disabled, scaling can be done on x- and y-axis separately
+        mChart.setPinchZoom(true);
+
+        // set an alternative background color
+        mChart.setBackgroundColor(Color.BLACK);
+
+        LineData data = new LineData();
+        data.setValueTextColor(Color.WHITE);
+
+        // add empty data
+        mChart.setData(data);
+
+        // get the legend (only possible after setting data)
+        Legend l = mChart.getLegend();
+
+        // modify the legend ...
+        l.setPosition(Legend.LegendPosition.LEFT_OF_CHART);
+        l.setForm(Legend.LegendForm.LINE);
+        l.setTypeface(mTfLight);
+        l.setTextColor(Color.RED);
+
+        XAxis xl = mChart.getXAxis();
+        xl.setTypeface(mTfLight);
+        xl.setTextColor(Color.BLUE);
+        xl.setDrawGridLines(false);
+        xl.setAvoidFirstLastClipping(true);
+        xl.setEnabled(true);
+
+        YAxis leftAxis = mChart.getAxisLeft();
+        leftAxis.setTypeface(mTfLight);
+        leftAxis.setTextColor(Color.RED);
+        leftAxis.setAxisMaxValue(150f);
+        leftAxis.setAxisMinValue(0f);
+        leftAxis.setDrawGridLines(true);
+
+        YAxis rightAxis = mChart.getAxisRight();
+        rightAxis.setEnabled(false);
+    }
+
+    /**
+     * Add data
+     */
+    private void addEntry() {
+
+        LineData data = mChart.getData();
+
+        if (data != null) {
+
+            ILineDataSet set = data.getDataSetByIndex(0);
+            // set.addEntry(...); // can be called as well
+
+            if (set == null) {
+                set = createSet();
+                data.addDataSet(set);
+            }
+
+            //data.addEntry(new Entry(set.getEntryCount(), (float) (Math.random() * 40) + 30f), 0);
+            data.addEntry(new Entry(set.getEntryCount(), (float)Analytics.getInstance().getCurrentRtt()), 0);
+            data.notifyDataChanged();
+
+            // let the chart know it's data has changed
+            mChart.notifyDataSetChanged();
+
+            // limit the number of visible entries
+            mChart.setVisibleXRangeMaximum(120);
+            // mChart.setVisibleYRange(30, AxisDependency.LEFT);
+
+            // move to the latest entry
+            mChart.moveViewToX(data.getEntryCount());
+
+            // this automatically refreshes the chart (calls invalidate())
+            // mChart.moveViewTo(data.getXValCount()-7, 55f,
+            // AxisDependency.LEFT);
+        }
+    }
+
+    /**
+     * Create data set
+     *
+     * @return
+     */
+    private LineDataSet createSet() {
+        LineDataSet set = new LineDataSet(null, "RTT(ms)");
+        set.setAxisDependency(YAxis.AxisDependency.LEFT);
+        set.setColor(ColorTemplate.getHoloBlue());
+        set.setCircleColor(Color.RED);
+        set.setLineWidth(2f);
+        set.setCircleRadius(4f);
+        set.setFillAlpha(65);
+        set.setFillColor(ColorTemplate.getHoloBlue());
+        set.setHighLightColor(Color.rgb(244, 117, 117));
+        set.setValueTextColor(Color.WHITE);
+        set.setValueTextSize(9f);
+        set.setDrawValues(false);
+        return set;
     }
 }

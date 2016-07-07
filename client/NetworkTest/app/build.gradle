@@ -49,4 +49,6 @@ dependencies {
 
     compile project(':library')
     compile project(':utils-v4')
+
+    compile project(':MPChartLib')
 }
