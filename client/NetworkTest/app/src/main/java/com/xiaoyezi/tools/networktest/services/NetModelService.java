@@ -167,9 +167,9 @@ public class NetModelService extends Service implements Runnable {
                     if (ret < 0) {
                         Log.d(TAG, "recvData error!!!");
                     }
+                } else {
+                    Thread.sleep(100);
                 }
-
-                Thread.sleep(100);
             }
         } catch (Exception e) {
             e.printStackTrace();

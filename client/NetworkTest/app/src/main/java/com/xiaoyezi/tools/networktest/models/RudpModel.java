@@ -43,6 +43,7 @@ public class RudpModel extends NetModel {
         try {
             if (mHost != null) {
                 try {
+                    reset();
                     mHost.clean();
                 } catch (Throwable e) {
                     e.printStackTrace();
@@ -71,6 +72,7 @@ public class RudpModel extends NetModel {
         }
 
         try {
+            reset();
             mHost.clean();
         } catch (Throwable e) {
             e.printStackTrace();
@@ -167,5 +169,33 @@ public class RudpModel extends NetModel {
 
     @Override
     public void loadLog() {
+    }
+
+    /**
+     * Reset peer.
+     */
+    private void reset() {
+        if (mPeer == null) {
+            return;
+        }
+
+        mPeer.disconnectNow(0);
+
+        // no need?
+//        Event event;
+//        try {
+//            while ((event = mHost.service(3000)) != null) {
+//                switch (event.type()) {
+//                    case Disconnect:
+//                        Log.d(TAG, "Disconnect!!!!");
+//                        return;
+//                }
+//            }
+//        } catch(Exception e) {
+//            e.printStackTrace();
+//        }
+
+        // Force the connection down.
+        mPeer.reset();
     }
 }
