@@ -13,10 +13,8 @@
 
     <string name="label_destination_ip">服务器IP地址: </string>
     <string name="label_port">端口: </string>
-    <string name="hint_ip">192.168.1.100</string>
     <string name="content_text">发送内容: </string>
     <string name="hint_text">Hello World!</string>
-    <string name="hint_port">50000</string>
     <string name="button_start">开始</string>
     <string name="button_stop">停止</string>
 

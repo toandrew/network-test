@@ -4,11 +4,14 @@
 
 #include <jni.h>
 
+#define LOG_TAG "xenet"
+#include <android/log.h>
+
 #include "enet/enet.h"
 #include "com_xiaoyezi_enet_Host.h"
 
 #ifdef DEBUG
-#define debug(fmt,args...) printf(fmt, ##args)
+#define debug(...) __android_log_print(ANDROID_LOG_DEBUG,LOG_TAG,__VA_ARGS__)
 #else
 #define debug(fmt,args...)
 #endif
@@ -154,12 +157,13 @@ JNIEXPORT jint JNICALL Java_com_xiaoyezi_enet_Host_service
 		if (ev != NULL) {
 			event = (ENetEvent *) (*env)->GetDirectBufferAddress(env, ev);
 		}
-
+        debug("Java_com_xiaoyezi_enet_Host_service!!");
 		int ret = enet_host_service(host, event, timeout);
 		if (ret < 0) {
 			(*env)->ThrowNew(env, (*env)->FindClass(env, "com/xiaoyezi/enet/EnetException"), "failed to service host");
 			return -1;
 		}
+		debug("Java_com_xiaoyezi_enet_Host_service!!![%d]",ret);
 
 		return ret;
 	}

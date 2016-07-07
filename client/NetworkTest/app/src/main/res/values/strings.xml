@@ -9,9 +9,9 @@
 
     <string name="label_destination_ip">Destination IP</string>
     <string name="label_port">Port</string>
-    <string name="hint_ip">192.168.1.100</string>
+    <string name="hint_ip">192.168.89.243</string>
     <string name="hint_text">Text to send</string>
-    <string name="hint_port">50000</string>
+    <string name="hint_port">20124</string>
     <string name="button_start">Start!</string>
     <string name="button_stop">Stop!</string>
 </resources>

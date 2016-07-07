@@ -29,9 +29,7 @@ public class Host {
     public Host(InetSocketAddress address, int peerCount, int channelLimit, int incomingBandwidth, int outgoingBandwidth)
             throws EnetException {
         if (address == null) {
-            Log.d(TAG, "Host: create client!");
             mNativeState = create(0, 0, peerCount, channelLimit, incomingBandwidth, outgoingBandwidth);
-            Log.d(TAG, "Host: after create client!" + mNativeState);
             return;
         }
 

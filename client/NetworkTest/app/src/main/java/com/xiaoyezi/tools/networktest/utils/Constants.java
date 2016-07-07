@@ -16,6 +16,10 @@ public class Constants {
         TYPE_RUDP
     }
 
+    public static final String TCP_DEFAULT_PORT = "20122";
+    public static final String UDP_DEFAULT_PORT = "20123";
+    public static final String RUDP_DEFAULT_PORT = "20124";
+
     public static final String TCP_DEFAULT_FILE = "network_test_tool_tcp.data";
     public static final String UDP_DEFAULT_FILE = "network_test_tool_udp.data";
     public static final String RUDP_DEFAULT_FILE = "network_test_tool_rudp.data";

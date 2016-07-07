@@ -66,10 +66,20 @@ public class TestFragment extends Fragment {
 
         EditText editText = (EditText) mView.findViewById(R.id.editTextIP);
         editText.setInputType(InputType.TYPE_CLASS_TEXT);
-        editText.setText(settings.getString("host", ""), TextView.BufferType.EDITABLE);
+        editText.setText(settings.getString("host", "192.168.89.243"), TextView.BufferType.EDITABLE);
         editText = (EditText) mView.findViewById(R.id.editTextPort);
         editText.setInputType(InputType.TYPE_CLASS_TEXT);
-        editText.setText(settings.getString("port", ""), TextView.BufferType.EDITABLE);
+
+        // fixed port
+        int type = settings.getInt("type", 0);
+        String defaultPort = Constants.TCP_DEFAULT_PORT;
+        if (type == 1) {
+            defaultPort = Constants.UDP_DEFAULT_PORT;
+        } else if (type == 2) {
+            defaultPort = Constants.RUDP_DEFAULT_PORT;
+        }
+        editText.setText(defaultPort, TextView.BufferType.EDITABLE);
+
         editText = (EditText) mView.findViewById(R.id.editTextData);
         editText.setText(settings.getString("dataText", ""), TextView.BufferType.EDITABLE);
 
@@ -135,7 +145,7 @@ public class TestFragment extends Fragment {
                     }
                 });
             }
-        }, 1000, 3000);
+        }, 1000, 2000);
     }
 
     @Override
@@ -258,6 +268,20 @@ public class TestFragment extends Fragment {
      */
     private void setPreferredTransportMode(Constants.TRANSPORT_TYPE type) {
         mPreferredTransportMode = type;
+
+        // update port
+        String defaultPort = Constants.TCP_DEFAULT_PORT;
+        switch (type) {
+            case TYPE_UDP:
+                defaultPort = Constants.UDP_DEFAULT_PORT;
+                break;
+            case TYPE_RUDP:
+                defaultPort = Constants.RUDP_DEFAULT_PORT;
+                break;
+        }
+
+        EditText editText = (EditText) mView.findViewById(R.id.editTextPort);
+        editText.setText(defaultPort, TextView.BufferType.EDITABLE);
     }
 
     /**

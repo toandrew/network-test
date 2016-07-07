@@ -3,11 +3,14 @@
 //
 #include <jni.h>
 
+#define LOG_TAG "xenet"
+#include <android/log.h>
+
 #include "enet/enet.h"
 #include "com_xiaoyezi_enet_Peer.h"
 
 #ifdef DEBUG
-#define debug(fmt,args...) printf(fmt, ##args)
+#define debug(...) __android_log_print(ANDROID_LOG_DEBUG,LOG_TAG,__VA_ARGS__)
 #else
 #define debug(fmt,args...)
 #endif
@@ -33,7 +36,7 @@ JNIEXPORT void JNICALL Java_com_xiaoyezi_enet_Peer_send
 	ENetPeer *peer = (ENetPeer *) (*env)->GetDirectBufferAddress(env, ctx);
 	ENetPacket *_packet = (ENetPacket *) (*env)->GetDirectBufferAddress(env, packet);
 	int ret = enet_peer_send(peer, (enet_uint8) channel, _packet);
-	debug("send(%p, %p, %p, %lu) = %d\n", peer, _packet, _packet->data, _packet->dataLength, ret);
+	debug("send(%p, %p, %p, %lu) = %d\n", peer, _packet, _packet->data, (unsigned long)_packet->dataLength, ret);
 	if (ret != 0) {
 		(*env)->ThrowNew(env, (*env)->FindClass(env, "com/xiaoyezi/enet/EnetException"), "send failed");
 	}

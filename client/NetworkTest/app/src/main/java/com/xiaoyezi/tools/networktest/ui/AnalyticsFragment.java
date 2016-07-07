@@ -85,7 +85,7 @@ public class AnalyticsFragment extends Fragment {
                     }
                 });
             }
-        }, 1000, 5000);
+        }, 1000, 1000);
     }
 
     @Override
